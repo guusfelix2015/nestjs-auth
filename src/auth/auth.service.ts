@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { AuthDto } from './dto/auth.dto';
 import { PrismaService } from 'prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,15 @@ export class AuthService {
       throw new BadRequestException('Email already exists');
     }
 
+    const hashedPassword = await this.hashPassword(password);
+
+    await this.prisma.user.create({
+      data: {
+        email,
+        hashedPassword,
+      },
+    });
+
     return { message: 'signup was succefull' };
   }
 
@@ -26,5 +36,12 @@ export class AuthService {
 
   async signout() {
     return '';
+  }
+
+  async hashPassword(password: string) {
+    const saltOrRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltOrRounds);
+
+    return hashedPassword;
   }
 }
