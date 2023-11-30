@@ -73,8 +73,9 @@ export class AuthService {
     return res.send({ message: 'signin was succefull' });
   }
 
-  async signout() {
-    return '';
+  async signout(req: Request, res: Response) {
+    res.clearCookie('token');
+    return res.send({ message: 'signout was succefull' });
   }
 
   async hashPassword(password: string) {
